@@ -17,6 +17,19 @@ def length_to_mask(length, max_len=None, dtype=None):
         mask = torch.as_tensor(mask, dtype=dtype, device=length.device)
     return mask
 
+def length_to_mask_pad_as_true(length, max_len=None):
+    """
+    Args:
+        length: B.
+    return B x max_len.
+    If max_len is None, then max of length will be used.
+    """
+    # assert len(length.shape) == 1, 'Length shape should be 1 dimensional.'
+    max_len = max_len or length.max().item()
+    mask = torch.arange(
+        max_len, dtype=length.dtype).expand(len(length), max_len) >= length.unsqueeze(1)
+    return mask
+
 
 def load_model_and_alphabet_core(args_dict, regression_data=None):
     args_dict = torch.load(args_dict)
