@@ -18,7 +18,7 @@ from utils_comm.log_util import logger
 from utils_comm.train_util import set_seed, get_device
 from projects.data_utils import get_input_df_v1
 from NeuroPredPLM.vocabulary import Vocabulary
-
+from NeuroPredPLM.dataset import Dataset
 
 class SelfAttTrainer():
     """
@@ -36,5 +36,6 @@ class SelfAttTrainer():
         training_dataset = Dataset(df_train, vocabulary, self.category_col_name)
         test_dataset = Dataset(df_test, vocabulary, self.category_col_name)
         
+
 if __name__ == '__main__':
-    main()
+    trainer = SelfAttTrainer()
