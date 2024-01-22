@@ -68,10 +68,12 @@ def get_input_df_v1():
     df_train[SEQUENCE] = df_train['seq']
     df_test = df_test[df_test[SEQUENCE].apply(is_natural_only_upper)]
     df_train = df_train[df_train[SEQUENCE].apply(is_natural_only_upper)]
-    df_test = df_test[df_test[SEQUENCE].apply(lambda x: len(x) <= MAX_SEQ_LEN)]
-    df_train = df_train[df_train[SEQUENCE].apply(lambda x: len(x) <= MAX_SEQ_LEN)]
+    df_test = df_test[df_test[SEQUENCE].apply(lambda x: LEAST_SEQ_LENGTH <= len(x) <= MAX_SEQ_LEN)]
+    df_train = df_train[df_train[SEQUENCE].apply(lambda x:  LEAST_SEQ_LENGTH <= len(x) <= MAX_SEQ_LEN)]
     df_test = df_test.drop_duplicates(subset=[SEQUENCE])
     df_train = df_train.drop_duplicates(subset=[SEQUENCE])
+    ic(len(df_test))
+    df_test = df_test[~df_test[SEQUENCE].isin(df_train[SEQUENCE])]
     ic(len(df_test), len(df_train))
     return df_train, df_test
 

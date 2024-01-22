@@ -27,14 +27,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, i):
         seq_str = self.df.iloc[i][self.seq_col_name]
-        ## debug
-        # try:
-        #     tensor = self.vocabulary.seq_to_tensor(seq_str)
-        # except Exception as identifier:
-        #     logger.error(f'error in seq_to_tensor {self.df["Sequence"].head()}')
-        #     logger.error(f'error in seq_to_tensor {seq_str}')
-        #     raise(identifier)
-        tensor = self.vocabulary.seq_to_tensor(seq_str)
+        tensor = self.vocabulary.seq_to_tensor_no_start(seq_str)
         if self.category_key:
             category = self.df.iloc[i][self.category_key]
             return tensor, category

@@ -33,7 +33,7 @@ class Vocabulary:
     WAE vocabulary is based on this vocabulary but slightly more clear logic. Only one real difference is WAE adds <unk> special token.
     """
 
-    def __init__(self, vocabulary):
+    def __init__(self, vocabulary, max_len=0):
         if "<pad>" not in vocabulary:
             vocabulary = {
                 character: value + 1 for character, value in vocabulary.items()
@@ -45,6 +45,7 @@ class Vocabulary:
             vocabulary["<end>"] = len(vocabulary)
         self.inv_vocabulary = {v: k for k, v in vocabulary.items()}
         self.vocabulary = vocabulary
+        self.max_len = max_len
         logger.info("vocabulary length %s", len(self.vocabulary))
 
     def letter_to_index(self, letter):
@@ -78,10 +79,13 @@ class Vocabulary:
         return tensor
     
     def seq_to_tensor_no_start(self, seq):
-        tensor = torch.zeros(len(seq) + 1, dtype=torch.long)
+        if self.max_len > 0:
+            tensor = torch.zeros(self.max_len+1, dtype=torch.long)
+        else:
+            tensor = torch.zeros(len(seq) + 1, dtype=torch.long)
         for i, letter in enumerate(seq):
             tensor[i] = torch.tensor(self.vocabulary[letter])
-        tensor[-1] = torch.tensor(self.vocabulary["<end>"])
+        tensor[len(seq)] = torch.tensor(self.vocabulary["<end>"])
         return tensor
 
     def save_vocab(self, save_file):
@@ -104,12 +108,12 @@ class Vocabulary:
         return Vocabulary(char_voc_)
 
     @classmethod
-    def load_vocab_file(cls, vocab_file):
+    def load_vocab_file(cls, vocab_file, max_len=0):
         """Loads json file"""
         Path(vocab_file).parent.mkdir(exist_ok=True, parents=True)
         with open(vocab_file, "r", encoding="utf-8") as f:
-            vocabulary = json.load(f)
-        return Vocabulary(vocabulary)
+            vocab_dict = json.load(f)
+        return Vocabulary(vocab_dict, max_len=max_len)
 
 
 if __name__ == "__main__":
